@@ -1,33 +1,56 @@
 /// <reference types="cypress" />
 
-describe("todo actions", () => {
-  beforeEach(() => {
-    cy.visit("http://todomvc-app-for-testing.surge.sh/");
+export function navigate() {
+  cy.visit("http://todomvc-app-for-testing.surge.sh/");
+}
 
-    cy.get(".new-todo", { timeout: 6000 }).type("Clean room{enter}");
-  });
+export function addTodo(todoText) {
+  cy.get(".new-todo").type(todoText + "{enter}");
+}
 
-  it("should add a new todo to the list", () => {
-    cy.get("label").should("have.text", "Clean room");
-    cy.get(".toggle").should("not.be.checked");
-  });
+export function toggleTodo(todoIndex) {
+  cy.get(`.todo-list li:nth-child(${todoIndex + 1}) .toggle`).click();
+}
 
-  describe("toggling todos", () => {
-    it("should toggle test correctly", () => {
-      cy.get(".toggle").click();
-      cy.get("label").should(
-        "have.css",
-        "text-decoration-line",
-        "line-through"
-      );
-    });
+export function showOnlyCompletedTodos() {
+  cy.contains("Completed").click();
+}
 
-    it("should clear completed", () => {
-      cy.get(".toggle").click();
+export function showOnlyActiveTodos() {
+  cy.contains("Active").click();
+}
 
-      cy.contains("Clear completed").click();
+export function showAllTodos() {
+  cy.contains("All").click();
+}
 
-      cy.get(".todo-list").should("not.have.descendants", "li");
-    });
-  });
-});
+export function clearCompleted() {
+  cy.contains("Clear completed").click();
+}
+
+export function validateNumberOfTodosShown(expectedNumberOfTodos) {
+  cy.get(".todo-list li").should("have.length", expectedNumberOfTodos);
+}
+
+export function validateTodoCompletedState(todoIndex, shouldBeCompleted) {
+  const l = cy.get(`.todo-list li:nth-child(${todoIndex + 1}) label`);
+
+  l.should(
+    `${shouldBeCompleted ? "" : "not."}have.css`,
+    "text-decoration-line",
+    "line-through"
+  );
+}
+
+export function validateTodoText(todoIndex, expectedText) {
+  cy.get(`.todo-list li:nth-child(${todoIndex + 1}) label`).should(
+    "have.text",
+    expectedText
+  );
+}
+
+export function validateToggleState(todoIndex, shouldBeToggled) {
+  const label = cy.get(`.todo-list li:nth-child(${todoIndex + 1}) label`);
+
+  label.should(`${shouldBeToggled ? "" : "not."}be.checked`);
+}
